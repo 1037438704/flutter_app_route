@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_route/routers/routes.dart';
 import 'package:flutter_app_route/utils/SPutils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import '../routers/application.dart';
 
 class HomeAty extends StatefulWidget {
   @override
@@ -13,22 +13,26 @@ class HomeAty extends StatefulWidget {
 }
 
 class _HomeAtyState extends State<HomeAty> {
-
   int _count = 0;
+
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      Sp.getValue('count').then((value){
-        _count = value;
+      Sp.getValue('count').then((value) {
+        if(value == null){
+          _count = 0;
+        }else{
+          _count = value;
+        }
       });
     });
   }
+
 //定时器
   Timer _timer;
   DateTime _lastPressedAt;
-
 
   @override
   Widget build(BuildContext context) {
@@ -50,55 +54,31 @@ class _HomeAtyState extends State<HomeAty> {
       },
       child: Scaffold(
         appBar: AppBar(title: Text('轻量级存储')),
-        body:  Column(
+        body: Column(
           children: <Widget>[
+            IconButton(
+                icon: Icon(Icons.message),
+                onPressed: () {
+                  Application.router.navigateTo(context,"${Routes.homePage}?id=${Uri.encodeComponent("哈哈哈")}");
+                }),
             Expanded(
               child: Text("$_count"),
             ),
             GestureDetector(
               onTap: () {
+                print("点击了");
                 Sp.add("count", _count++);
                 setState(() {
-                  Sp.getValue('count').then((value){
+                  Sp.getValue('count').then((value) {
                     _count = value;
                   });
                 });
-                },
+              },
               child: Icon(Icons.add_box),
             )
           ],
-
         ),
       ),
     );
-
   }
-
-//  void _add() async {
-//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//    _count++;
-//    sharedPreferences.setInt("count", _count);
-//    print("第$_count条");
-//    _show();
-//  }
-//  void _show() async{
-//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//
-//    if(sharedPreferences.getInt('count') != null){
-//      setState(() {
-//        _count = sharedPreferences.getInt('count');
-//        Fluttertoast.showToast(msg: _count.toString());
-//      });
-//    }
-//  }
-//  void _clean() async{
-//    //清除所有的存储
-//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//    sharedPreferences.clear();
-//  }
-//  void cls() async{
-//    //删除指定的key
-//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-//    sharedPreferences.remove('count');
-//  }
 }
