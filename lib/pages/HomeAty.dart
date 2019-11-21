@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app_route/utils/SPutils.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,7 +19,11 @@ class _HomeAtyState extends State<HomeAty> {
   @override
   void initState() {
     super.initState();
-    _show();
+    setState(() {
+      Sp.getValue('count').then((value){
+        _count = value;
+      });
+    });
   }
 //定时器
   Timer _timer;
@@ -27,9 +32,7 @@ class _HomeAtyState extends State<HomeAty> {
 
   @override
   Widget build(BuildContext context) {
-
     //上次点击时间
-
 //将Scaffold 作为WillPopScope的子控件
     return WillPopScope(
       onWillPop: () async {
@@ -54,8 +57,13 @@ class _HomeAtyState extends State<HomeAty> {
             ),
             GestureDetector(
               onTap: () {
-                _add();
-              },
+                Sp.add("count", _count++);
+                setState(() {
+                  Sp.getValue('count').then((value){
+                    _count = value;
+                  });
+                });
+                },
               child: Icon(Icons.add_box),
             )
           ],
@@ -66,31 +74,31 @@ class _HomeAtyState extends State<HomeAty> {
 
   }
 
-  void _add() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    _count++;
-    sharedPreferences.setInt("count", _count);
-    print("第$_count条");
-    _show();
-  }
-  void _show() async{
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-
-    if(sharedPreferences.getInt('count') != null){
-      setState(() {
-        _count = sharedPreferences.getInt('count');
-        Fluttertoast.showToast(msg: _count.toString());
-      });
-    }
-  }
-  void _clean() async{
-    //清除所有的存储
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.clear();
-  }
-  void cls() async{
-    //删除指定的key
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.remove('count');
-  }
+//  void _add() async {
+//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//    _count++;
+//    sharedPreferences.setInt("count", _count);
+//    print("第$_count条");
+//    _show();
+//  }
+//  void _show() async{
+//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//
+//    if(sharedPreferences.getInt('count') != null){
+//      setState(() {
+//        _count = sharedPreferences.getInt('count');
+//        Fluttertoast.showToast(msg: _count.toString());
+//      });
+//    }
+//  }
+//  void _clean() async{
+//    //清除所有的存储
+//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//    sharedPreferences.clear();
+//  }
+//  void cls() async{
+//    //删除指定的key
+//    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//    sharedPreferences.remove('count');
+//  }
 }
